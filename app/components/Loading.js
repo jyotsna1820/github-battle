@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
 const styles = {
@@ -12,27 +12,24 @@ const styles = {
   }
 }
 
-export default class Loading extends React.Component {
-  state = { content: this.props.text }
-  componentDidMount () {
-    const { speed, text } = this.props
+const Loading = ({text="Loading", speed=300}) => {
+  const [content, setContent] = useState(text);
 
-    this.interval = window.setInterval(() => {
-      this.state.content === text + '...'
-        ? this.setState({ content: text })
-        : this.setState(({ content }) => ({ content: content + '.' }))
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      content === text + "..."
+      ? setContent(text)
+      : setContent((c) => c + '.')
     }, speed)
-  }
-  componentWillUnmount () {
-    window.clearInterval(this.interval)
-  }
-  render() {
-    return (
-      <p style={styles.content}>
-        {this.state.content}
-      </p>
-    )
-  }
+
+    return () => window.clearInterval(id)
+  }, [text, speed])
+
+  return (
+    <p style={styles.content}>
+      {content}
+    </p>
+  )
 }
 
 Loading.propTypes = {
@@ -40,7 +37,4 @@ Loading.propTypes = {
   speed: PropTypes.number.isRequired,
 }
 
-Loading.defaultProps = {
-  text: 'Loading',
-  speed: 300
-}
+export default Loading;
